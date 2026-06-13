@@ -1,115 +1,198 @@
-export function generateInsertUpdateSP(metadata) {
-  const { parent, columns } = metadata;
+export function generateInsertUpdateSP(meta) {
+  const parent = meta.parent || {};
+  const rows = meta.columns || [];
 
-  // ---------- Utils ----------
-  const parse = (val) => {
+  const procName = parent.name || "sp_generated_proc";
+  const table = parent.table || "YOUR_TABLE";
+
+  const author = parent.author || "unknown_user";
+  const product = parent.product || "";
+  const module = parent.module || "";
+  const description = parent.description || "";
+  const createdOn = parent.date || new Date().toISOString();
+
+  const userVar = parent.userVar || "C2C_User";
+  const resultVar = parent.resultVar || "LogicApps_Result";
+
+  const errSuccessInsert = parent.errSuccessInsert || "S1010";
+  const errSuccessUpdate = parent.errSuccessUpdate || "S1011";
+  const errDuplicate = parent.errDuplicate || "E1011";
+  const errSqlException = parent.errSqlException || "E1012";
+
+  // ====================================================================
+  // Helper: Convert "column1,column2" / "[col1,col2]" / "col1" into array
+  // ====================================================================
+  function colArray(val) {
     if (!val) return [];
-    try {
-      const arr = JSON.parse(val);
-      return Array.isArray(arr) ? arr : [];
-    } catch {
-      return val
-        .replace(/[\[\]"]/g, "")
-        .split(",")
-        .map((x) => x.trim())
-        .filter(Boolean);
+    if (Array.isArray(val)) return val;
+    if (typeof val === "string" && val.startsWith("[") && val.endsWith("]")) {
+      try {
+        return JSON.parse(val.replace(/'/g, '"'));
+      } catch (e) {}
     }
-  };
+    return [val];
+  }
 
-  const detectType = (col) => {
-    const c = col.toLowerCase();
-    if (c.endsWith("_id") || c.endsWith("_no") || c.includes("cuser"))
-      return "INT";
-    if (c.includes("date") || c.endsWith("_dt") || c.includes("c2c_cdate"))
-      return "DATE";
-    if (c.includes("status")) return "TINYINT(1)";
-    return "VARCHAR(255)";
-  };
+  // Build column sets
+  const insertCols = rows.flatMap((r) => colArray(r.Insert));
+  const updateCols = rows.flatMap((r) => colArray(r.Update));
+  const whereCols = rows.flatMap((r) => colArray(r.Where));
+  const dateCols = rows.flatMap((r) => colArray(r.ConvertDate));
 
-  // ---------- Extract Metadata ----------
-  const block = columns?.[0] || {};
+  // Remove unwanted parameters (your requirement)
+  const removeParams = ["C2C_Cuser", "C2C_Uuser", "C2C_Cdate", "C2C_Udate"].map(
+    (x) => x.toUpperCase()
+  );
 
-  const insertCols = parse(block.Insert);
-  const updateCols = parse(block.Update);
-  const whereCols = parse(block.Where);
-  const dateCols = parse(block.ConvertDate);
-  const countCols = parse(block.RecordCount);
-  const prefixCols = parse(block.Prefix);
+  // Build unique IN parameters
+  const uniqueParams = [
+    ...new Set([...insertCols, ...updateCols, ...whereCols]),
+  ].filter((p) => !removeParams.includes(p.toUpperCase()));
 
-  const allParams = [
-    ...insertCols,
-    ...updateCols,
-    ...whereCols,
-    ...prefixCols,
-    ...dateCols,
-  ];
-
-  const uniqueParams = [...new Set(allParams)];
-
-  // ---------- Build Procedure Parts ----------
-  const spParams = uniqueParams
-    .map((c) => `IN p_${c} ${detectType(c)}`)
+  const params = uniqueParams
+    .map((c) => `IN p_${c} VARCHAR(255)`)
     .join(",\n    ");
 
-  const insertPlaceholders = insertCols.map((c) => `p_${c}`).join(", ");
+  const finalParams = `
+    ${params},
+    IN p_${userVar} INT,
 
-  const updateSet = updateCols.map((c) => `${c} = p_${c}`).join(", ");
 
-  const whereCond = whereCols.map((c) => `${c} = p_${c}`).join(" AND ");
+    
+    OUT p_${resultVar} VARCHAR(250)
+  `.trim();
 
-  const dateConvertBlock = dateCols
-    .map((c) => `SET ${c} = STR_TO_DATE(p_${c}, '%Y-%m-%d');`)
-    .join("\n    ");
+  // ============================================================
+  // INSERT column/value builder
+  // ============================================================
+  const insertColNames = insertCols.map((c) => `\`${c}\``).join(", ");
 
-  const recordCountBlock = countCols.length
-    ? `SELECT COUNT(*) INTO vCount 
-    FROM ${parent.table} 
-    WHERE ${countCols.map((c) => `${c} = p_${c}`).join(" AND ")};`
-    : "";
+  const insertValues = insertCols
+    .map((c) => {
+      const col = c.toUpperCase();
+      if (col.endsWith("_CDATE"))
+        return `CONVERT_TZ(NOW(), '+00:00', '+05:30')`;
+      if (col.endsWith("_CUSER")) return `p_${userVar}`;
+      if (dateCols.includes(c)) return `CONVERT_TZ(NOW(), '+00:00', '+05:30')`;
+      return `p_${c}`;
+    })
+    .join(", ");
 
-  // ---------- Final SP Template ----------
-  return `
+  // ============================================================
+  // UPDATE SET builder
+  // ============================================================
+  const updateSet = updateCols
+    .map((c) => {
+      const col = c.toUpperCase();
+      if (col.endsWith("_UDATE"))
+        return `\`${c}\` = CONVERT_TZ(NOW(), '+00:00', '+05:30')`;
+      if (col.endsWith("_UUSER")) return `\`${c}\` = p_${userVar}`;
+      return `\`${c}\` = p_${c}`;
+    })
+    .join(",\n            ");
+
+  // WHERE clause
+  const whereClause = whereCols.length
+    ? whereCols.map((c) => `\`${c}\` = p_${c}`).join(" AND ")
+    : "1=0";
+
+  const pk = whereCols[0]; // primary key (first Where column)
+
+  // ============================================================
+  // FINAL SP TEMPLATE
+  // ============================================================
+  const sp = `
 DELIMITER $$
 
-CREATE PROCEDURE ${parent.name} (
-    ${spParams}
+CREATE PROCEDURE ${procName} (
+    ${finalParams}
 )
 BEGIN
-    -- =================================================================================================================
-    -- Company: LogicAppsMI                 Description: ${parent.description}          Product name:${parent.product}
-    -- Module name: ${parent.module}        Date: ${parent.date}                   Author name: ${parent.author}
-    -- ===============================================================================================================
+    -- ===============================================================================
+    -- Company: LogicAppsMI       Description: ${description}
+    -- Product: ${product}        Module: ${module}
+    -- Date: ${createdOn}         Author: ${author}
+    -- ===============================================================================
 
-    DECLARE vCount INT DEFAULT 0;
+    DECLARE v_Record_Count INT DEFAULT 0;
+    DECLARE v_Err_Msg VARCHAR(250);
 
-    -- Convert date columns
-    ${dateConvertBlock}
+    -- SQL Exception Handler
+    DECLARE EXIT HANDLER FOR SQLEXCEPTION
+    BEGIN
+        SELECT Error_Msg INTO v_Err_Msg
+        FROM DCS_M_ERR_MESSAGE
+        WHERE Error_Code = '${errSqlException}'
+        LIMIT 1;
 
-    -- Record count
-    ${recordCountBlock}
+        SET p_${resultVar} = v_Err_Msg;
+        ROLLBACK;
+    END;
 
-    IF vCount = 0 THEN
+    START TRANSACTION;
 
-        -- INSERT
-        INSERT INTO ${parent.table} (
-            ${insertCols.join(", ")}
+    -- Duplicate check logic
+    SELECT COUNT(*) INTO v_Record_Count
+    FROM ${table}
+    WHERE ${whereClause};
+
+    -- INSERT CASE
+    IF (p_${pk} <= 0 AND v_Record_Count = 0) THEN
+        
+        SELECT Error_Msg INTO v_Err_Msg
+        FROM DCS_M_ERR_MESSAGE
+        WHERE Error_Code = '${errSuccessInsert}'
+        LIMIT 1;
+
+        INSERT INTO ${table} (
+            ${insertColNames}
         ) VALUES (
-            ${insertPlaceholders}
+            ${insertValues}
         );
 
-        ${parent.scopeIdentity ? "SET @NewId = LAST_INSERT_ID();" : ""}
+        SET p_${resultVar} = v_Err_Msg;
 
-    ELSE
+    -- INSERT DUPLICATE
+    ELSEIF (p_${pk} <= 0 AND v_Record_Count > 0) THEN
+        
+        SELECT Error_Msg INTO v_Err_Msg
+        FROM DCS_M_ERR_MESSAGE
+        WHERE Error_Code = '${errDuplicate}'
+        LIMIT 1;
 
-        -- UPDATE
-        UPDATE ${parent.table}
-        SET ${updateSet}
-        WHERE ${whereCond};
+        SET p_${resultVar} = v_Err_Msg;
 
+    -- UPDATE CASE
+    ELSEIF (p_${pk} > 0 AND v_Record_Count = 0) THEN
+        
+        SELECT Error_Msg INTO v_Err_Msg
+        FROM DCS_M_ERR_MESSAGE
+        WHERE Error_Code = '${errSuccessUpdate}'
+        LIMIT 1;
+
+        UPDATE ${table}
+        SET
+            ${updateSet}
+        WHERE ${whereClause};
+
+        SET p_${resultVar} = v_Err_Msg;
+
+    -- UPDATE DUPLICATE
+    ELSEIF (p_${pk} > 0 AND v_Record_Count > 0) THEN
+        
+        SELECT Error_Msg INTO v_Err_Msg
+        FROM DCS_M_ERR_MESSAGE
+        WHERE Error_Code = '${errDuplicate}'
+        LIMIT 1;
+
+        SET p_${resultVar} = v_Err_Msg;
     END IF;
 
-END$$
+    COMMIT;
+END $$
 
 DELIMITER ;
-`.trim();
+`;
+
+  return sp;
 }

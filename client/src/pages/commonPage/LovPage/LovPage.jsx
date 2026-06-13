@@ -6,7 +6,7 @@ import TabMenu from "../../../components/Tabs/TabMenu";
 import MasterGrid from "../../../components/MasterGrid/MasterGrid";
 import FormGrid from "../../../components/FormGrid/FormGrid";
 import Toaster from "../../../components/Toaster/Toaster";
-import { Container, Row, Col } from "react-bootstrap";
+import { Container, Row, Col, Alert } from "react-bootstrap";
 import "../../Style.css";
 
 const LovPage = () => {
@@ -230,6 +230,13 @@ const LovPage = () => {
         <Header />
 
         <Container fluid className="py-4">
+          <Alert variant="info" className="mb-4 shadow-sm">
+            <h5><i className="bi bi-info-circle-fill me-2"></i>List of Values (LOV) Configuration</h5>
+            <p className="mb-0">
+              <strong>Usage:</strong> Define lookup categories or enums (e.g., 'Status', 'Roles') used across your Projects. 
+              These serve as parent categories for the actual dropdown items configured in LOV Details.
+            </p>
+          </Alert>
           {/* Tabs */}
           <TabMenu tabs={tabs} variant="tabs" defaultActiveKey="master" />
 

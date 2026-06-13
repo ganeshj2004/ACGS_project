@@ -5,8 +5,8 @@ import LeftTabMenu from "../../../components/LeftTabMenu/LeftTabMenu";
 import TabMenu from "../../../components/Tabs/TabMenu";
 import MasterGrid from "../../../components/MasterGrid/MasterGrid";
 import FormGrid from "../../../components/FormGrid/FormGrid";
+import { Container, Row, Col, Alert } from "react-bootstrap";
 import Toaster from "../../../components/Toaster/Toaster";
-import { Container, Row, Col } from "react-bootstrap";
 import "../../Style.css";
 
 const ProductPage = () => {
@@ -264,6 +264,12 @@ const ProductPage = () => {
         <Header />
 
         <Container fluid className="py-4">
+          <Alert variant="info" className="mb-4 shadow-sm">
+            <h5><i className="bi bi-info-circle-fill me-2"></i>Product Configuration</h5>
+            <p className="mb-0">
+              <strong>Usage:</strong> Register individual applications (Products) belonging to a Project (e.g. 'React Frontend', 'Node Backend'). Let the Developer target specific code outputs per product.
+            </p>
+          </Alert>
           {/* Tabs */}
           <TabMenu tabs={tabs} variant="tabs" defaultActiveKey="master" />
 

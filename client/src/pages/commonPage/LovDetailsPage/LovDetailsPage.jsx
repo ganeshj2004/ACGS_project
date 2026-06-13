@@ -231,6 +231,14 @@ const LovDetailsPage = () => {
         <Header />
 
         <Container fluid className="py-4">
+          <Alert variant="info" className="mb-4 shadow-sm">
+            <h5><i className="bi bi-info-circle-fill me-2"></i>LOV Details Configuration</h5>
+            <p className="mb-0">
+              <strong>Usage:</strong> Populate standard dropdown values (e.g., 'Active', 'Inactive', 'Admin') mapped back to their parent LOV categories. 
+              These are used to dynamically populate select inputs across generated apps.
+            </p>
+          </Alert>
+
           <TabMenu tabs={tabs} variant="tabs" defaultActiveKey="master" />
 
           {/* Dropdown + Buttons */}
@@ -241,8 +249,9 @@ const LovDetailsPage = () => {
                 onChange={handleLovChange}
                 disabled={isLoading}
               >
+                <option value="">-- Select LOV --</option>
                 {lovOptions.map((opt) => (
-                  <option key={opt.value} value={opt.value}>
+                  <option key={`lov-opt-${opt.value}`} value={opt.value}>
                     {opt.label}
                   </option>
                 ))}

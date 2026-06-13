@@ -5,8 +5,8 @@ import LeftTabMenu from "../../../components/LeftTabMenu/LeftTabMenu";
 import TabMenu from "../../../components/Tabs/TabMenu";
 import FormGrid from "../../../components/FormGrid/FormGrid";
 import MasterGrid from "../../../components/MasterGrid/MasterGrid";
+import { Container, Row, Col, Alert } from "react-bootstrap";
 import Toaster from "../../../components/Toaster/Toaster";
-import { Container, Row, Col } from "react-bootstrap";
 import "../../Style.css";
 
 const DbConnectionPage = () => {
@@ -314,6 +314,13 @@ const DbConnectionPage = () => {
         <Header />
 
         <Container fluid className="py-4">
+          <Alert variant="info" className="mb-4 shadow-sm">
+            <h5><i className="bi bi-info-circle-fill me-2"></i>Database Connection Configuration</h5>
+            <p className="mb-0">
+              <strong>Usage:</strong> Register the target databases for your Projects. 
+              The Code Generator uses these credentials to introspect schemas and auto-generate stored procedures.
+            </p>
+          </Alert>
           {/* Tabs */}
           <TabMenu tabs={tabs} variant="tabs" defaultActiveKey="master" />
 

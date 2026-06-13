@@ -1,0 +1,32 @@
+.project-card {
+  border-radius: 15px;
+  transition: all 0.3s ease;
+  overflow: hidden;
+}
+
+.project-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 25px rgba(0,0,0,0.1) !important;
+}
+
+.project-icon {
+  font-size: 2.5rem;
+  background: #f1f5f9;
+  width: 60px;
+  height: 60px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 12px;
+}
+
+.btn-dark {
+  background: #0f172a;
+  border: none;
+  border-radius: 10px;
+  padding: 10px;
+}
+
+.btn-dark:hover {
+  background: #1e293b;
+}

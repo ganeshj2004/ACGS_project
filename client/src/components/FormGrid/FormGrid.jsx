@@ -41,9 +41,7 @@ const FormGrid = ({
             return [f.name, 1];
           default:
             if (f.type === "select") {
-              const firstValue =
-                f.options?.[0]?.value !== undefined ? f.options[0].value : 0;
-              return [f.name, firstValue];
+              return [f.name, ""];
             }
             return [f.name, f.type === "checkbox" ? false : ""];
         }
@@ -158,17 +156,19 @@ const FormGrid = ({
                                     <Select
                                       options={f.options || []}
                                       value={
-                                        (f.options || []).find(
-                                          (opt) =>
-                                            String(opt.value) ===
-                                            String(row[f.name] ?? 0)
-                                        ) || null
+                                        row[f.name]
+                                          ? (f.options || []).find(
+                                              (opt) =>
+                                                String(opt.value) ===
+                                                String(row[f.name])
+                                            ) || null
+                                          : null
                                       }
                                       onChange={(selected) =>
                                         handleChange(
                                           i,
                                           f.name,
-                                          selected ? selected.value : 0
+                                          selected ? selected.value : ""
                                         )
                                       }
                                       menuPortalTarget={document.body}

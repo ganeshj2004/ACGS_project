@@ -5,8 +5,8 @@ import LeftTabMenu from "../../../components/LeftTabMenu/LeftTabMenu";
 import TabMenu from "../../../components/Tabs/TabMenu";
 import MasterGrid from "../../../components/MasterGrid/MasterGrid"; 
 import FormGrid from "../../../components/FormGrid/FormGrid";
+import { Container, Row, Col, Alert } from "react-bootstrap";
 import Toaster from "../../../components/Toaster/Toaster";
-import { Container, Row, Col } from "react-bootstrap";
 import "../../Style.css";
 
 const ProjectPage = () => {
@@ -248,6 +248,13 @@ const ProjectPage = () => {
         <Header />
 
         <Container fluid className="py-4">
+          <Alert variant="info" className="mb-4 shadow-sm">
+            <h5><i className="bi bi-info-circle-fill me-2"></i>Project Configuration</h5>
+            <p className="mb-0">
+              <strong>Usage:</strong> Define the top-level Projects your team is working on. 
+              Each project is linked to a core programming Language and serves as the umbrella for Modules and Products.
+            </p>
+          </Alert>
           {/* Tabs */}
           <TabMenu tabs={tabs} variant="tabs" defaultActiveKey="master" />
 

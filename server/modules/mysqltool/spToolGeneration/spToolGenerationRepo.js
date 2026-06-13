@@ -59,6 +59,7 @@ const spToolGenerationRepo = {
       const [rows] = await pool.query("SELECT @p_C2C_Result AS result;");
 
       const result = rows?.[0]?.result || "UNKNOWN";
+      console.log("✅ Repo: SP Tool Generation Result:", result);
 
       const isError =
         result.toString().toLowerCase().includes("error") ||

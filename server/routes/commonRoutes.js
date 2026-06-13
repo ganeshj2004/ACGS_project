@@ -12,6 +12,9 @@ import dropDownRoutes from "../modules/common/dropDowm/dropDownRoutes.js";
 import masterGridRoutes from "../modules/common/masterGrid/masterGridRoutes.js";
 import errorMessageRoutes from "../modules/common/errorMessage/errorMessageRoutes.js";
 import productRoutes from "../modules/common/product/productRoutes.js";
+import userRoutes from "../modules/common/user/userRoutes.js";
+import userProjectRoutes from "../modules/common/userProject/userProjectRoutes.js";
+
 
 // ✅ Use routes with base paths
 router.use("/language", languageRoutes);
@@ -24,5 +27,7 @@ router.use("/drop-down", dropDownRoutes);
 router.use("/master-grid", masterGridRoutes);
 router.use("/error-msg", errorMessageRoutes);
 router.use("/product", productRoutes);
+router.use("/user", userRoutes);
+router.use("/user-project", userProjectRoutes);
 
 export default router;

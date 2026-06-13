@@ -2,6 +2,9 @@ import React, { useState, useEffect } from "react";
 import axiosClient from "../../../api/axiosClient";
 import Header from "../../../components/Header/Header";
 import LeftTabMenu from "../../../components/LeftTabMenu/LeftTabMenu";
+import { useLocation } from "react-router-dom";
+import { useAuth } from "../../../context/AuthContext";
+
 import { Container, Row, Col, Form, Button, Card } from "react-bootstrap";
 import TabMenu from "../../../components/Tabs/TabMenu";
 import { validateField } from "../../../utils/validationHelper";
@@ -23,6 +26,9 @@ const GenPage = () => {
   const [activeTab, setActiveTab] = useState("insert");
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [toastData, setToastData] = useState([]);
+  const location = useLocation();
+  const { user } = useAuth();
+
 
   const [form, setForm] = useState({
     projectId: "",
@@ -34,9 +40,9 @@ const GenPage = () => {
     tableName: "",
     userVar: "",
     scopeVar: "",
-    scopeIdentity: true,
-    errMsg: true,
-    status: true,
+    scopeIdentity: false,
+    errMsg: false,
+    status: false,
     inactiveReason: "",
     user: 1,
     columns: [],
@@ -148,9 +154,15 @@ const GenPage = () => {
   // FETCH OPTIONS
   // ========================
   const fetchProjects = async () => {
-    const res = await axiosClient.get("/common/drop-down/PROJECT/NULL");
+    let url = "/common/drop-down/PROJECT/NULL";
+    if (user?.Role === "Developer") {
+      // For presentation, we might use a specific endpoint or filter the existing one
+      // Let's use the all projects for now but we can refine this if assigned project logic is strict
+    }
+    const res = await axiosClient.get(url);
     setProjects(res.data.result.map((p) => ({ value: p.Id, label: p.Name })));
   };
+
 
   const fetchModules = async (projectId) => {
     const res = await axiosClient.get(`/common/drop-down/MODULE/${projectId}`);
@@ -185,7 +197,15 @@ const GenPage = () => {
   useEffect(() => {
     fetchProjects();
     fetchTables();
-  }, []);
+
+    // Handle projectId from URL
+    const params = new URLSearchParams(location.search);
+    const urlProjectId = params.get("projectId");
+    if (urlProjectId) {
+      handleSelectChange("projectId", { value: parseInt(urlProjectId) });
+    }
+  }, [location.search]);
+
 
   // ========================
   // SELECT HANDLER
@@ -440,6 +460,60 @@ const GenPage = () => {
                     </Col>
                   </Row>
 
+                  {/* VARIABLE SETTINGS */}
+                  <Row className="mb-3 mt-3">
+                    {/* ser_Var */}
+                    <Col md={3}>
+                      <Form.Label>UserVar (ser_Var)</Form.Label>
+                      <Form.Control
+                        type="text"
+                        placeholder="Example: userId"
+                        value={form.userVar}
+                        onChange={(e) =>
+                          setForm({ ...form, userVar: e.target.value })
+                        }
+                      />
+                    </Col>
+
+                    {/* Scope Identity */}
+                    <Col md={3}>
+                      <Form.Label>Use Scope Identity</Form.Label>
+                      <Form.Check
+                        type="checkbox"
+                        label="Enable"
+                        checked={form.scopeIdentity}
+                        onChange={(e) =>
+                          setForm({ ...form, scopeIdentity: e.target.checked })
+                        }
+                      />
+                    </Col>
+
+                    {/* Error Message */}
+                    <Col md={3}>
+                      <Form.Label>Enable Err_Msg</Form.Label>
+                      <Form.Check
+                        type="checkbox"
+                        label="Enable"
+                        checked={form.errMsg}
+                        onChange={(e) =>
+                          setForm({ ...form, errMsg: e.target.checked })
+                        }
+                      />
+                    </Col>
+
+                    {/* Scope_Var */}
+                    <Col md={3}>
+                      <Form.Label>Scope Output Var (Scope_Var)</Form.Label>
+                      <Form.Control
+                        type="text"
+                        placeholder="Example: scopeId"
+                        value={form.scopeVar}
+                        onChange={(e) =>
+                          setForm({ ...form, scopeVar: e.target.value })
+                        }
+                      />
+                    </Col>
+                  </Row>
 
                   {/* TABLE */}
                   <Row className="mb-3">

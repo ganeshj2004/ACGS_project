@@ -1,5 +1,3 @@
-// spTool.controller.js
-
 import { getSPMetadata } from "./spTool.service.js";
 import { generateInsertUpdateSP } from "./templates/insertUpdate.template.js";
 

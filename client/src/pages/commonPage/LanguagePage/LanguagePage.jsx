@@ -5,7 +5,7 @@ import LeftTabMenu from "../../../components/LeftTabMenu/LeftTabMenu";
 import TabMenu from "../../../components/Tabs/TabMenu";
 import MasterGrid from "../../../components/MasterGrid/MasterGrid";
 import FormGrid from "../../../components/FormGrid/FormGrid";
-import { Container, Row, Col } from "react-bootstrap";
+import { Container, Row, Col, Alert } from "react-bootstrap";
 import Toaster from "../../../components/Toaster/Toaster";
 import "../../Style.css";
 
@@ -195,6 +195,13 @@ const LanguagePage = () => {
         <Header />
 
         <Container fluid className="py-4">
+          <Alert variant="info" className="mb-4 shadow-sm">
+            <h5><i className="bi bi-info-circle-fill me-2"></i>Language Configuration</h5>
+            <p className="mb-0">
+              <strong>Usage:</strong> Register the programming languages Supported by your Code Generator (e.g., Javascript, Python). This is the base context required before creating Projects.
+            </p>
+          </Alert>
+
           <TabMenu tabs={tabs} variant="tabs" defaultActiveKey="master" />
 
           <Row className="mt-4">

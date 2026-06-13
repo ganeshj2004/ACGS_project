@@ -65,13 +65,15 @@ const MasterGrid = ({ title, data, isLoading, error, moduleName, onEdit }) => {
                     {key.toLowerCase().includes("status") ? (
                       <span
                         className={
-                          row[key]?.toLowerCase() === "active"
+                          String(row[key]) === "1" || String(row[key]).toLowerCase() === "active" || row[key] === true
                             ? "text-success fw-semibold"
                             : "text-danger fw-semibold"
                         }
                       >
-                        {row[key]}
+                        {String(row[key]) === "1" || row[key] === true ? "Active" : 
+                         String(row[key]) === "0" || row[key] === false ? "Inactive" : row[key]}
                       </span>
+
                     ) : (
                       row[key]
                     )}
