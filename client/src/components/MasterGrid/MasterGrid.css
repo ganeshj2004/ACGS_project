@@ -1,20 +1,97 @@
 .master-grid-card {
-  background: #fff;
-  border-radius: 10px;
-  padding: 20px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  background: white;
+  border-radius: 16px;
+  border: 1px solid #e2e8f0;
+  overflow: hidden;
+  box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1);
 }
 
-.master-grid-card table {
-  font-size: 14px;
+.table-responsive {
+  margin: 0;
 }
 
-.master-grid-card th {
-  background-color: #007bff !important;
-  color: #fff;
-  text-transform: capitalize;
+.master-grid-card .table {
+  margin-bottom: 0;
 }
 
-.master-grid-card td {
-  color: #333;
+.master-grid-card thead th {
+  background: #f8fafc;
+  color: #64748b;
+  font-weight: 700;
+  text-transform: uppercase;
+  font-size: 0.75rem;
+  letter-spacing: 0.05em;
+  padding: 1.25rem 1.5rem;
+  border-bottom: 2px solid #e2e8f0;
+}
+
+.master-grid-card tbody td {
+  padding: 1rem 1.5rem;
+  color: #0f172a;
+  font-size: 0.875rem;
+  border-bottom: 1px solid #f1f5f9;
+}
+
+.master-grid-card tbody tr:hover {
+  background-color: #f8fafc;
+}
+
+.master-grid-card .btn-outline-primary {
+  border-radius: 8px;
+  font-weight: 600;
+  padding: 0.4rem 1rem;
+  font-size: 0.75rem;
+  transition: all 0.2s;
+}
+
+.master-grid-card .btn-outline-primary:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 6px -1px rgba(37, 99, 235, 0.2);
+}
+
+.btn-edit-action {
+  text-decoration: none !important;
+  color: #2563eb !important;
+  font-weight: 600 !important;
+  font-size: 0.8125rem !important;
+  padding: 0.5rem 1rem !important;
+  border-radius: 8px !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 0.5rem !important;
+  background-color: #eff6ff !important;
+  transition: all 0.2s ease !important;
+  border: 1px solid transparent !important;
+}
+
+.btn-edit-action:hover {
+  background-color: #dbeafe !important;
+  border-color: #bfdbfe !important;
+  transform: translateY(-1px);
+}
+
+.edit-icon {
+  font-size: 0.875rem;
+}
+
+.text-success.fw-semibold {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  background: #ecfdf5;
+  color: #059669 !important;
+  padding: 0.25rem 0.75rem;
+  border-radius: 9999px;
+  font-size: 0.75rem;
+}
+
+.text-danger.fw-semibold {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  background: #fef2f2;
+  color: #dc2626 !important;
+  padding: 0.25rem 0.75rem;
+  border-radius: 9999px;
+  font-size: 0.75rem;
 }

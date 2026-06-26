@@ -14,6 +14,7 @@ import errorMessageRoutes from "../modules/common/errorMessage/errorMessageRoute
 import productRoutes from "../modules/common/product/productRoutes.js";
 import userRoutes from "../modules/common/user/userRoutes.js";
 import userProjectRoutes from "../modules/common/userProject/userProjectRoutes.js";
+import dashboardRoutes from "../modules/common/dashboard/dashboardRoutes.js";
 
 
 // ✅ Use routes with base paths
@@ -29,5 +30,6 @@ router.use("/error-msg", errorMessageRoutes);
 router.use("/product", productRoutes);
 router.use("/user", userRoutes);
 router.use("/user-project", userProjectRoutes);
+router.use("/dashboard", dashboardRoutes);
 
 export default router;

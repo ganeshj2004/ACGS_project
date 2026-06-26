@@ -16,21 +16,26 @@ const LoginPage = () => {
     e.preventDefault();
     setError("");
     try {
-      const response = await axios.post("http://localhost:5000/api/common/user/login", {
-        username,
-        password,
-      });
+      const response = await axios.post(
+        "http://localhost:5000/api/common/user/login",
+        {
+          username,
+          password,
+        },
+      );
 
       if (response.data.success) {
         login(response.data.user);
         if (response.data.user.Role === "Admin") {
-          navigate("/language");
+          navigate("/admin-dashboard");
         } else {
           navigate("/developer-dashboard");
         }
       }
     } catch (err) {
-      setError(err.response?.data?.message || "Login failed. Please try again.");
+      setError(
+        err.response?.data?.message || "Login failed. Please try again.",
+      );
     }
   };
 
@@ -45,10 +50,14 @@ const LoginPage = () => {
           <Card.Body className="p-5">
             <div className="text-center mb-4">
               <div className="brand-logo mb-3">⚡</div>
-              <h2 className="brand-name">CodeGen Pro</h2>
+              <h2 className="brand-name">ACGS Pro</h2>
               <p className="text-muted">Enter your credentials to continue</p>
             </div>
-            {error && <Alert variant="danger" className="py-2 small">{error}</Alert>}
+            {error && (
+              <Alert variant="danger" className="py-2 small">
+                {error}
+              </Alert>
+            )}
             <Form onSubmit={handleSubmit}>
               <Form.Group className="mb-3" controlId="username">
                 <Form.Label className="small fw-bold">Username</Form.Label>
@@ -72,7 +81,10 @@ const LoginPage = () => {
                   required
                 />
               </Form.Group>
-              <Button type="submit" className="w-100 btn-primary-gradient py-2 fw-bold bg-dark border-0">
+              <Button
+                type="submit"
+                className="w-100 btn-primary-gradient py-2 fw-bold bg-dark border-0"
+              >
                 Sign In
               </Button>
             </Form>

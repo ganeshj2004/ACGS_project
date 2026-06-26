@@ -38,10 +38,10 @@ const MasterGrid = ({ title, data, isLoading, error, moduleName, onEdit }) => {
   return (
     <div className="master-grid-card">
       <div className="table-responsive">
-        <Table bordered hover size="sm" className="align-middle text-center">
-          <thead className="table-primary">
+        <Table hover className="align-middle mb-0">
+          <thead>
             <tr>
-              <th>Action</th>
+              <th className="text-center">Action</th>
               {headers.map((key) => (
                 <th key={key}>{key.replace(/_/g, " ")}</th>
               ))}
@@ -51,12 +51,13 @@ const MasterGrid = ({ title, data, isLoading, error, moduleName, onEdit }) => {
             {data.map((row, rowIndex) => (
               <tr key={rowIndex}>
                 {/* 🖊️ Edit button */}
-                <td>
+                <td className="text-center">
                   <Button
-                    variant="outline-primary"
-                    size="sm"
+                    variant="link"
+                    className="btn-edit-action"
                     onClick={() => onEdit(row)}
                   >
+                    <span className="edit-icon">✏️</span>
                     Edit
                   </Button>
                 </td>

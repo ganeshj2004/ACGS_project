@@ -25,6 +25,8 @@ const GenPage = () => {
   const [generatedSp, setGeneratedSp] = useState("");
   const [activeTab, setActiveTab] = useState("insert");
   const [isSubmitted, setIsSubmitted] = useState(false);
+  const [genType, setGenType] = useState("sql");
+  const [currentProjectLanguage, setCurrentProjectLanguage] = useState("");
   const [toastData, setToastData] = useState([]);
   const location = useLocation();
   const { user } = useAuth();
@@ -156,11 +158,14 @@ const GenPage = () => {
   const fetchProjects = async () => {
     let url = "/common/drop-down/PROJECT/NULL";
     if (user?.Role === "Developer") {
-      // For presentation, we might use a specific endpoint or filter the existing one
-      // Let's use the all projects for now but we can refine this if assigned project logic is strict
+      url = `/common/drop-down/PROJECT/${user.User_ID || user.id}`;
     }
     const res = await axiosClient.get(url);
-    setProjects(res.data.result.map((p) => ({ value: p.Id, label: p.Name })));
+    setProjects(res.data.result.map((p) => ({ 
+      value: p.Id, 
+      label: p.Name,
+      language: p.Language_Name 
+    })));
   };
 
 
@@ -195,16 +200,27 @@ const GenPage = () => {
   };
 
   useEffect(() => {
-    fetchProjects();
-    fetchTables();
-
-    // Handle projectId from URL
-    const params = new URLSearchParams(location.search);
-    const urlProjectId = params.get("projectId");
-    if (urlProjectId) {
-      handleSelectChange("projectId", { value: parseInt(urlProjectId) });
+    if (user) {
+      fetchProjects();
+      fetchTables();
     }
-  }, [location.search]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user]);
+
+  useEffect(() => {
+    if (projects.length > 0) {
+      const params = new URLSearchParams(location.search);
+      const urlProjectId = params.get("projectId");
+      if (urlProjectId) {
+        const projId = parseInt(urlProjectId);
+        if (form.projectId !== projId) {
+          const selectedProj = projects.find((p) => p.value === projId);
+          handleSelectChange("projectId", selectedProj || { value: projId });
+        }
+      }
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [location.search, projects, form.projectId]);
 
 
   // ========================
@@ -215,6 +231,7 @@ const GenPage = () => {
     setForm({ ...form, [name]: value });
 
     if (name === "projectId") {
+      setCurrentProjectLanguage(selected?.language || "");
       fetchModules(value);
       fetchProducts(value);
     }
@@ -285,20 +302,22 @@ const GenPage = () => {
     }
   };
 
-  const handleGenerateSp = async () => {
+  const handleGenerateSp = async (type = "sql") => {
     if (!generatedId) return;
+    setGenType(type);
 
     try {
-      const res = await axiosClient.get(`/mysql-tool/sp-gen/${generatedId}`);
+      const res = await axiosClient.get(`/mysql-tool/sp-gen/${generatedId}?type=${type}`);
 
       if (res.data?.sp) {
         setGeneratedSp(res.data.sp);
         setShowGeneratedTab(true);
         setActiveTab("generated");
+        showToast(`${type.toUpperCase()} generated successfully`, "success");
       }
     } catch (err) {
       console.error(err);
-      showToast("Error generating SP", "danger");
+      showToast("Error generating code", "danger");
     }
   };
 
@@ -308,10 +327,19 @@ const GenPage = () => {
   };
 
   const handleDownload = () => {
+    const extensions = {
+      sql: ".sql",
+      node: ".js",
+      react: ".jsx",
+      java: ".java",
+      python: ".py",
+      php: ".php",
+    };
+    const ext = extensions[genType] || ".txt";
     const element = document.createElement("a");
-    const file = new Blob([generatedSp], { type: "text/sql" });
+    const file = new Blob([generatedSp], { type: "text/plain" });
     element.href = URL.createObjectURL(file);
-    element.download = `${form.spName || "generated_sp"}.sql`;
+    element.download = `${form.spName || "generated_code"}${ext}`;
     document.body.appendChild(element);
     element.click();
   };
@@ -667,15 +695,75 @@ const GenPage = () => {
                   ))}
 
                   <Row className="mt-4">
-                    <Col md={3}>
+                    <Col md={12} className="d-flex gap-3">
                       {!isSubmitted ? (
-                        <Button variant="primary" onClick={handleSubmit}>
-                          Submit
+                        <Button variant="primary" size="lg" onClick={handleSubmit}>
+                          Submit Data Schema
                         </Button>
                       ) : (
-                        <Button variant="success" onClick={handleGenerateSp}>
-                          Generate
-                        </Button>
+                        <>
+                          {(currentProjectLanguage.toLowerCase() === "sql" || currentProjectLanguage === "") && (
+                            <Button variant="success" size="lg" onClick={() => handleGenerateSp("sql")}>
+                              Generate SQL SP
+                            </Button>
+                          )}
+                          
+                          {(currentProjectLanguage.toLowerCase() === "javascript" || currentProjectLanguage.toLowerCase() === "node") && (
+                            <>
+                              <Button variant="success" size="lg" onClick={() => handleGenerateSp("sql")}>
+                                Generate SQL SP
+                              </Button>
+                              <Button variant="info" className="text-white" size="lg" onClick={() => handleGenerateSp("node")}>
+                                Generate Node Stack
+                              </Button>
+                              <Button variant="dark" size="lg" onClick={() => handleGenerateSp("react")}>
+                                Generate React Page
+                              </Button>
+                            </>
+                          )}
+
+                          {currentProjectLanguage.toLowerCase() === "python" && (
+                            <>
+                             <Button variant="success" size="lg" onClick={() => handleGenerateSp("sql")}>
+                                Generate SQL SP
+                             </Button>
+                             <Button variant="info" className="text-white" size="lg" onClick={() => handleGenerateSp("python")}>
+                                Generate Python Stack
+                             </Button>
+                             <Button variant="dark" size="lg" onClick={() => handleGenerateSp("react")}>
+                                Generate React Page
+                             </Button>
+                            </>
+                          )}
+
+                          {currentProjectLanguage.toLowerCase() === "java" && (
+                            <>
+                             <Button variant="success" size="lg" onClick={() => handleGenerateSp("sql")}>
+                                Generate SQL SP
+                             </Button>
+                             <Button variant="info" className="text-white" size="lg" onClick={() => handleGenerateSp("java")}>
+                                Generate Java Stack
+                             </Button>
+                             <Button variant="dark" size="lg" onClick={() => handleGenerateSp("react")}>
+                                Generate React Page
+                             </Button>
+                            </>
+                          )}
+
+                          {currentProjectLanguage.toLowerCase() === "php" && (
+                            <>
+                             <Button variant="success" size="lg" onClick={() => handleGenerateSp("sql")}>
+                                Generate SQL SP
+                             </Button>
+                             <Button variant="info" className="text-white" size="lg" onClick={() => handleGenerateSp("php")}>
+                                Generate PHP Stack
+                             </Button>
+                             <Button variant="dark" size="lg" onClick={() => handleGenerateSp("react")}>
+                                Generate React Page
+                             </Button>
+                            </>
+                          )}
+                        </>
                       )}
                     </Col>
                   </Row>
@@ -694,7 +782,7 @@ const GenPage = () => {
                   <pre
                     className="generated-code"
                     dangerouslySetInnerHTML={{
-                      __html: highlightSQL(generatedSp),
+                      __html: genType === "sql" ? highlightSQL(generatedSp) : generatedSp,
                     }}
                   />
 

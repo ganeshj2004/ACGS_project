@@ -1,35 +1,41 @@
-/* 🌐 Container styling */
 .custom-tab-menu {
-  border-bottom: 2px solid #dee2e6;
-  background-color: #f8f9fa;
-  padding: 0.5rem 1rem;
-  border-radius: 0.5rem;
+  border-bottom: 2px solid #e2e8f0;
+  background-color: white;
+  padding: 0 1.5rem;
   display: flex;
-  gap: 1rem;
+  gap: 2rem;
+  border-radius: 12px;
+  box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05);
 }
 
-/* 🧭 Default tab link */
 .custom-tab-menu .nav-link {
-  color: #495057; /* neutral text color */
-  font-weight: 500;
-  border: none;
-  transition: all 0.3s ease;
-  background-color: transparent;
-  border-radius: 0.5rem;
-  padding: 0.5rem 1rem;
-}
-
-/* 🎯 Hover effect */
-.custom-tab-menu .nav-link:hover {
-  background-color: #e9ecef; /* light gray background */
-  color: #212529; /* slightly darker text */
-}
-
-/* 🔵 Active tab look */
-.custom-tab-menu .nav-link.active {
-  background-color: #0d6efd1a; /* subtle blue tint */
-  color: #0d6efd !important; /* blue text */
+  color: #64748b;
   font-weight: 600;
-  border-bottom: 3px solid #0d6efd;
-  border-radius: 0.5rem 0.5rem 0 0;
+  font-size: 0.875rem;
+  border: none;
+  background-color: transparent;
+  padding: 1.25rem 0.5rem;
+  position: relative;
+  transition: all 0.2s;
+  cursor: pointer;
+}
+
+.custom-tab-menu .nav-link:hover {
+  color: #0f172a;
+}
+
+.custom-tab-menu .nav-link.active {
+  color: #2563eb !important;
+  background-color: transparent;
+}
+
+.custom-tab-menu .nav-link.active::after {
+  content: '';
+  position: absolute;
+  bottom: -2px;
+  left: 0;
+  width: 100%;
+  height: 2px;
+  background-color: #2563eb;
+  border-radius: 99px;
 }

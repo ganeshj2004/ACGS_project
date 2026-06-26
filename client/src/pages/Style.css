@@ -1,65 +1,100 @@
+:root {
+  --primary: #2563eb;
+  --primary-hover: #1d4ed8;
+  --bg-light: #f8fafc;
+  --text-main: #0f172a;
+  --text-muted: #64748b;
+  --sidebar-bg: #0f172a;
+  --card-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+  --card-shadow-hover: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+}
+
+body {
+  margin: 0;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  background-color: var(--bg-light);
+  color: var(--text-main);
+}
+
 .master-page {
   display: flex;
-  min-height: 100vh;
-  background-color: #f8f9fa; /* Light gray background */
+  width: 100%;
+  height: 100vh;
+  overflow: hidden;
 }
 
-/* Sidebar */
 .sidebar {
-  width: 250px;
-  background-color: #212529;
-  color: white;
-  flex-shrink: 0;
-  padding-top: 20px;
+  width: 260px;
+  min-width: 260px;
+  flex: 0 0 260px;
+  height: 100%;
+  z-index: 1000;
+  background: var(--sidebar-bg);
+  overflow: hidden;
 }
 
-/* Main content */
 .main-content {
-  flex-grow: 1;
+  flex: 1;
+  min-width: 0;
+  height: 100%;
+  background-color: var(--bg-light);
   display: flex;
   flex-direction: column;
   overflow-y: auto;
 }
 
-/* Header fixed at the top */
-.main-content > header,
-.main-content > .header {
+.header {
+  height: 64px;
+  background: white;
+  border-bottom: 1px solid #e2e8f0;
+  display: flex;
+  align-items: center;
+  padding: 0 2rem;
   position: sticky;
   top: 0;
-  z-index: 1000;
-  background: #fff;
-  border-bottom: 1px solid #dee2e6;
+  z-index: 900;
 }
 
-/* Inner container spacing */
-.form-area,
-.empty-grid {
+.form-area, .empty-grid {
   background: white;
-  border-radius: 8px;
-  padding: 20px;
-  box-shadow: 0px 2px 6px rgba(0, 0, 0, 0.1);
+  border-radius: 12px;
+  padding: 2rem;
+  box-shadow: var(--card-shadow);
+  border: 1px solid #f1f5f9;
 }
 
-/* Tabs spacing */
 .nav-tabs {
-  margin-bottom: 1rem;
+  border-bottom: 2px solid #e2e8f0;
+  margin-bottom: 2rem;
+  gap: 1rem;
 }
 
-/* Responsive adjustments */
+.nav-tabs .nav-link {
+  border: none;
+  font-weight: 600;
+  color: var(--text-muted);
+  padding: 0.75rem 1rem;
+  transition: all 0.2s;
+}
+
+.nav-tabs .nav-link.active {
+  color: var(--primary);
+  border-bottom: 2px solid var(--primary);
+  background: transparent;
+}
+
+@media (max-width: 1024px) {
+  .sidebar {
+    width: 80px;
+  }
+}
+
 @media (max-width: 768px) {
+  .master-page {
+    flex-direction: column;
+  }
   .sidebar {
     width: 100%;
+    height: auto;
   }
-  .main-content {
-    margin-left: 0;
-  }
-}
-
-.card {
-  border-radius: 10px;
-  background: #fff;
-}
-
-form label {
-  font-weight: 600;
 }

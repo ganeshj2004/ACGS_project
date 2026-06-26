@@ -36,6 +36,7 @@ const GenPage = lazy(() => import("./pages/mySQLTool/GenPage/GenPage.jsx"));
 const UserPage = lazy(() => import("./pages/commonPage/UserPage/UserPage.jsx"));
 const UserProjectPage = lazy(() => import("./pages/commonPage/UserProjectPage/UserProjectPage.jsx"));
 const DeveloperDashboard = lazy(() => import("./pages/Developer/DeveloperDashboard.jsx"));
+const AdminDashboard = lazy(() => import("./pages/Admin/AdminDashboard.jsx"));
 
 
 const ProtectedRoute = ({ children, allowedRole }) => {
@@ -60,6 +61,7 @@ function App() {
         >
           <Routes>
             <Route path="/login" element={<LoginPage />} />
+            <Route path="/admin-dashboard" element={<ProtectedRoute allowedRole="Admin"><AdminDashboard /></ProtectedRoute>} />
             <Route path="/" element={<Navigate to="/login" replace />} />
             
             {/* Admin Routes */}
